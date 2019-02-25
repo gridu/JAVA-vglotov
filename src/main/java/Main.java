@@ -3,23 +3,24 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) {
+
+        String[] initial = {"glotov", "vladimir", "gonna", "tolve", "external", "sorting", "problem", "car", "baed", "afood", "12number", "uleep", "funk"};
+        printArray(initial);
+        sort(initial, 5);
+        printArray(initial);
+    }
+
+    private static void sort(String[] initial, int maxRam) {
         List<String> ramArray1;
         List<String> ramArray2;
-        String[] initial = {"glotov", "vladimir", "gonna", "tolve", "external", "sorting", "problem", "car", "baed", "afood", "12number", "uleep", "funk"};
-        int maxRam = 5;
         int halfMaxRam = maxRam / 2;
         int maxCycle = initial.length / halfMaxRam;
         if (initial.length % halfMaxRam > 0) {
             maxCycle += 1;
         }
 
-        System.out.println("Initial array:");
-        for (String str: initial) {
-            System.out.print(str + ' ');
-        }
-
-        for (int p = 0; p < maxCycle-1; p++) {
-            for (int j = 0; j < maxCycle - 1 -p; j++) {
+        for (int p = 0; p < maxCycle - 1; p++) {
+            for (int j = 0; j < maxCycle - 1 - p; j++) {
                 String[] subArray1 = new String[halfMaxRam];
                 String[] subArray2 = new String[halfMaxRam];
                 boolean isCut = false;
@@ -71,8 +72,11 @@ public class Main {
                 }
             }
         }
-        System.out.println("\nSorted array:");
-        for (String str: initial) {
+    }
+
+    private static void printArray(String[] array) {
+        System.out.println("\nArray values:");
+        for (String str : array) {
             System.out.print(str + ' ');
         }
     }
