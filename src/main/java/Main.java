@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
         List<String> ramArray1;
         List<String> ramArray2;
-        String[] initial = {"glotov", "vladimir", "gonna", "solve", "external", "sorting", "problem", "car", "baed", "afood", "sleep"};
+        String[] initial = {"glotov", "vladimir", "gonna", "solve", "external", "sorting", "problem", "car", "baed", "afood", "sleep", "fusk"};
         int maxRam = 5;
         int halfMaxRam = maxRam/2;
         int maxCycle = initial.length/halfMaxRam;
@@ -100,8 +100,6 @@ public class Main {
                 for (String str : initial) {
                     System.out.print(str + ' ');
                 }
-//                isCut = false;
-//                cutLength = 0;
             }
         }
     }
