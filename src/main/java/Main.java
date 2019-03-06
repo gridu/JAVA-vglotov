@@ -1,3 +1,6 @@
+import org.testng.annotations.Test;
+
+
 import java.util.*;
 
 public class Main {
@@ -10,7 +13,7 @@ public class Main {
         printArray(initial);
     }
 
-    private static void sort(String[] initial, int maxRam) {
+    public static void sort(String[] initial, int maxRam) {
         List<String> ramArray1;
         List<String> ramArray2;
         int halfMaxRam = maxRam / 2;
@@ -79,5 +82,14 @@ public class Main {
         for (String str : array) {
             System.out.print(str + ' ');
         }
+    }
+
+    @Test
+    private static void sortTest(){
+        String[] actual = {"a", "c", "e", "3", "f", "d", "b"};
+        String[] expected = {"3", "a", "b", "c", "d", "e", "f"};
+        sort(actual, 3);
+        printArray(actual);
+        assert(Arrays.equals(actual, expected));
     }
 }
