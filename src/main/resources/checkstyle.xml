@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.1//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_1.dtd">
+
+<module name="Checker">
+    <module name="TreeWalker">
+        <module name="EmptyLineSeparator">
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="allowNoEmptyLineBetweenFields" value="false"/>
+            <property name="tokens" value="METHOD_DEF"/>
+        </module>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+        <module name="SingleSpaceSeparator"/>
+        <module name="WhitespaceAfter">
+            <property name="tokens" value="COMMA, SEMI"/>
+        </module>
+    </module>
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="false"/>
+    </module>
+</module>
+

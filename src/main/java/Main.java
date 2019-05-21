@@ -1,6 +1,8 @@
 import org.testng.annotations.Test;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static java.lang.Long.sum;
@@ -9,68 +11,84 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        File file = new File("src/main/resources/input.txt");
-        RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+        String path = "src/main/resources/input.txt";
+        int maxRam = 140;
+        System.out.println("min stringCount is " + getMinStrCount(path, maxRam, Files.lines(Paths.get(path)).count()));
+        sortFile(path, maxRam);
 
-        sortFile(randomAccessFile, 20);
     }
 
-    public static void sortFile(RandomAccessFile file, int maxRam) throws IOException {
+    public static int getMinStrCount(String path, int maxRam, long lineCount) throws IOException {
+        int biggestLineSize = 0;
+        int tempSize = 0;
+        int minStringCount = 0;
 
-        int halfMaxRam = maxRam / 2;
-        long pointer1Writing;
-        long pointer1Reading = 0;
-        long pointer2Writing;
-        long pointer2Reading = 0;
+        LineNumberReader lnr = new LineNumberReader(new FileReader(path));
 
-        while (pointer1Reading < file.length()) {
-            List<String> ramArray1 = new ArrayList<>();
-            pointer1Writing = pointer1Reading;
-            pointer1Reading = fillArrayList(file, pointer1Reading, ramArray1, halfMaxRam);
-            pointer2Reading = pointer1Reading;
-
-            while (pointer2Reading < file.length()) {
-
-                List<String> ramArray2 = new ArrayList<>();
-
-//                pointer2Writing = pointer2Reading;
-                pointer2Reading = fillArrayList(file, pointer2Reading, ramArray2, halfMaxRam);
-
-//                ramArray1.addAll(ramArray2);
-
-                for (String str: ramArray1) {
-                    System.out.print(str + " ");
-                }
-                System.out.println();
-//                Collections.sort(ramArray1);
-
-                for (String str: ramArray2) {
-                    System.out.print(str + " ");
-                }
-
-//                TODO: проблема с оставшимися строками если они разной длины
-
-//                for (int i = 0; i < arr1size; i++) {
-//                    System.out.println("1st arr elem before writing: " + ramArray1.get(i));
-//                    file.seek(pointer1Writing);
-//                    System.out.println("pointer1Writing= " + pointer1Writing);
-//                    file.writeBytes(ramArray1.get(i) + "\n");
-//                    pointer1Writing += ramArray1.get(i).length() + 1;
-//                }
-//
-//                for (int i = arr1size; i < ramArray1.size(); i++) {
-//                    System.out.println("2nd arr elem before writing: " + ramArray1.get(i));
-//                    file.seek(pointer2Writing);
-//                    System.out.println("pointer2Writing= " + pointer2Writing);
-//                    file.writeBytes(ramArray1.get(i));
-//                    pointer2Writing += ramArray1.get(i).length();
-//                    if (i < ramArray1.size() - 1) {
-//                        file.writeBytes("\n");
-//                        pointer2Writing++;
-//                    }
-//                }
+        for (int i = 0; i < lineCount; i++) {
+            try {
+                tempSize = lnr.readLine().length() * 2;
+                if (tempSize > biggestLineSize) biggestLineSize = tempSize;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+
+        if (biggestLineSize > maxRam / 2) {
+            System.out.println("No good because biggest line size is " + biggestLineSize);
+        } else {
+            minStringCount = (maxRam / 2) / biggestLineSize;
+        }
+
+        return minStringCount;
+    }
+
+    public static void sortFile(String path, int maxRam) throws IOException {
+
+//        LineNumberReader lnr = new LineNumberReader(new FileReader(path));
+        RandomAccessFile file = new RandomAccessFile(new File(path), "rw");
+        long totalLines = Files.lines(Paths.get(path)).count();
+        int minStringCount = getMinStrCount(path, maxRam, totalLines);
+        int segmentCount = (int) (totalLines / minStringCount);
+        if (totalLines % minStringCount > 0) segmentCount += 1;
+
+        for (int i = 0; i < segmentCount; i++) {
+            ArrayList<String> arr1 = new ArrayList<>();
+            goToLineNumber(i * minStringCount, file);
+
+            for (int k = 0; k < minStringCount; k++) {
+                arr1.add(file.readLine());
+            }
+
+            for (int j = i + 1; j < segmentCount; j++) {
+                ArrayList<String> arr2 = new ArrayList<>();
+
+                for (int k = 0; k < minStringCount; k++) {
+                    String elemToAdd = file.readLine();
+                    if (elemToAdd != null) arr2.add(file.readLine());
+                }
+
+                arr1.addAll(arr2);
+                Collections.sort(arr1);
+
+                //дальше записываем сразу из arr1
+            }
+        }
+    }
+
+
+    private static void goToLineNumber(int number, RandomAccessFile file) {
+        try {
+            file.seek(0);
+            for (int i = 0; i < number; i++) {
+                file.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //потом использовать writeChars не в этом методе
+        //может придется удалять строки
     }
 
 
@@ -96,7 +114,7 @@ public class Main {
     private static void writeToFile(RandomAccessFile file, long startPos, List<String> srcArray) throws IOException {
         file.seek(startPos);
 
-        for (String str: srcArray) {
+        for (String str : srcArray) {
             file.writeBytes(str + "\n");
         }
 
