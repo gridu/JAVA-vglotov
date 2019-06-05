@@ -1,95 +1,93 @@
+import org.testng.annotations.Test;
+
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static java.lang.Long.sum;
+import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        String path = "src/main/resources/input.txt";
-        int maxRam = 140;
-        System.out.println("min stringCount is " + getMinStrCount(path, maxRam, Files.lines(Paths.get(path)).count()));
-        sortFile(path, maxRam);
-
-    }
-
-    public static int getMinStrCount(String path, int maxRam, long lineCount) throws IOException {
-        int biggestLineSize = 0;
-        int minStringCount = 0;
-        int tempSize;
-
-        LineNumberReader lnr = new LineNumberReader(new FileReader(path));
-
-        for (int i = 0; i < lineCount; i++) {
-            try {
-                tempSize = lnr.readLine().length() * 2;
-                if (tempSize > biggestLineSize) biggestLineSize = tempSize;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (biggestLineSize > maxRam / 2) {
-            System.out.println("No good because biggest line size is " + biggestLineSize);
-        } else {
-            minStringCount = (maxRam / 2) / biggestLineSize;
-        }
-
-        return minStringCount;
-    }
-
-    public static void sortFile(String path, int maxRam) throws IOException {
-
-        RandomAccessFile file = new RandomAccessFile(new File(path), "rw");
-        long totalLines = Files.lines(Paths.get(path)).count();
-        int minStringCount = getMinStrCount(path, maxRam, totalLines);
-        int segmentCount = (int) (totalLines / minStringCount);
-        if (totalLines % minStringCount > 0) segmentCount += 1;
-
-        for (int i = 0; i < segmentCount; i++) {
-            ArrayList<String> arr1 = new ArrayList<>();
-            goToLineNumber(i * minStringCount, file);
-
-            for (int k = 0; k < minStringCount; k++) {
-                arr1.add(file.readLine());
-            }
-
-            for (int j = i + 1; j < segmentCount; j++) {
-                ArrayList<String> arr2 = new ArrayList<>();
-
-                for (int k = 0; k < minStringCount; k++) {
-                    String elemToAdd = file.readLine();
-                    if (elemToAdd != null) arr2.add(file.readLine());
-                }
-
-                arr1.addAll(arr2);
-                Collections.sort(arr1);
-
-                //дальше записываем сразу из arr1
-            }
-        }
-    }
-
-
-    private static void goToLineNumber(int number, RandomAccessFile file) {
+        String pathInput = "src/main/resources/input.txt";
+        String pathOutput = "src/main/resources/output.txt";
+        List<String> lines = null;
         try {
-            file.seek(0);
-            for (int i = 0; i < number; i++) {
-                file.readLine();
-            }
+            lines = Files.readAllLines(Paths.get(pathInput), Charset.forName("UTF-8"));
+        String[] strArray = lines.toArray(new String[lines.size()]);
+
+        mergeSort(strArray, 0, strArray.length - 1);
+        System.out.println(Arrays.toString(strArray));
+        write(pathOutput, strArray);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void writeToFile(RandomAccessFile file, long startPos, List<String> srcArray) throws IOException {
-        file.seek(startPos);
-
-        for (String str : srcArray) {
-            file.writeBytes(str + "\n");
+    public static void mergeSort(String[] a, int from, int to) {
+        if (from == to) {
+            return;
         }
+        int mid = (from + to) / 2;
+        mergeSort(a, from, mid);
+        mergeSort(a, mid + 1, to);
+        merge(a, from, mid, to);
+    }
+
+    public static void merge(String[] a, int from, int mid, int to) {
+        int n = to - from + 1;
+        String[] b = new String[n];
+        int i1 = from;
+        int i2 = mid + 1;
+        int j = 0;
+
+        while (i1 <= mid && i2 <= to) {
+            if (a[i1].compareTo(a[i2]) < 0) {
+                b[j] = a[i1];
+                i1++;
+            } else {
+                b[j] = a[i2];
+                i2++;
+            }
+            j++;
+        }
+
+        while (i1 <= mid) {
+            b[j] = a[i1];
+            i1++;
+            j++;
+        }
+
+        while (i2 <= to) {
+            b[j] = a[i2];
+            i2++;
+            j++;
+        }
+
+        for (j = 0; j < n; j++) {
+            a[from + j] = b[j];
+        }
+    }
+
+    public static void write (String filename, String[] x) throws IOException{
+        BufferedWriter outputWriter = null;
+        outputWriter = new BufferedWriter(new FileWriter(filename));
+        for (int i = 0; i < x.length; i++) {
+            outputWriter.write(x[i]);
+            outputWriter.newLine();
+        }
+        outputWriter.flush();
+        outputWriter.close();
+    }
+
+    @Test
+    public void positiveTest() {
+        String[] actual = { "one", "two", "3" };
+        String[] expected = { "3", "one", "two" };
+        Main.mergeSort(actual,0, actual.length - 1);
+        assertArrayEquals(expected, actual);
     }
 }
