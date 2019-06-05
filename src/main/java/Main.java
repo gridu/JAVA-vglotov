@@ -17,11 +17,11 @@ public class Main {
         List<String> lines = null;
         try {
             lines = Files.readAllLines(Paths.get(pathInput), Charset.forName("UTF-8"));
-        String[] strArray = lines.toArray(new String[lines.size()]);
+            String[] strArray = lines.toArray(new String[lines.size()]);
 
-        mergeSort(strArray, 0, strArray.length - 1);
-        System.out.println(Arrays.toString(strArray));
-        write(pathOutput, strArray);
+            mergeSort(strArray, 0, strArray.length - 1);
+            System.out.println(Arrays.toString(strArray));
+            write(pathOutput, strArray);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,12 +72,12 @@ public class Main {
         }
     }
 
-    public static void write (String filename, String[] x) throws IOException{
+    public static void write(String filename, String[] x) throws IOException {
         BufferedWriter outputWriter = null;
         outputWriter = new BufferedWriter(new FileWriter(filename));
         for (int i = 0; i < x.length; i++) {
             outputWriter.write(x[i]);
-            outputWriter.newLine();
+            if (i != x.length - 1) outputWriter.newLine();
         }
         outputWriter.flush();
         outputWriter.close();
@@ -85,9 +85,9 @@ public class Main {
 
     @Test
     public void positiveTest() {
-        String[] actual = { "one", "two", "3" };
-        String[] expected = { "3", "one", "two" };
-        Main.mergeSort(actual,0, actual.length - 1);
+        String[] actual = {"one", "two", "3"};
+        String[] expected = {"3", "one", "two"};
+        Main.mergeSort(actual, 0, actual.length - 1);
         assertArrayEquals(expected, actual);
     }
 }
