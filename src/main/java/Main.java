@@ -1,3 +1,5 @@
+import ThreadPoolProject.TestTask;
+import ThreadPoolProject.ThreadPool;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -10,7 +12,7 @@ import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         String pathInput = "src/main/resources/input.txt";
         String pathOutput = "src/main/resources/output.txt";
@@ -25,9 +27,20 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //ThreadPool
+
+        //create queue size - 3
+        //Number of threads - 4
+        ThreadPool threadPool = new ThreadPool(3,4);
+        //Created 15 Tasks and submit to pool
+        for(int taskNumber = 1 ; taskNumber <= 7; taskNumber++) {
+            TestTask task = new TestTask(taskNumber);
+            threadPool.submitTask(task);
+        }
     }
 
-    public static void mergeSort(String[] a, int from, int to) {
+    private static void mergeSort(String[] a, int from, int to) {
         if (from == to) {
             return;
         }
@@ -37,7 +50,7 @@ public class Main {
         merge(a, from, mid, to);
     }
 
-    public static void merge(String[] a, int from, int mid, int to) {
+    private static void merge(String[] a, int from, int mid, int to) {
         int n = to - from + 1;
         String[] b = new String[n];
         int i1 = from;
@@ -72,7 +85,7 @@ public class Main {
         }
     }
 
-    public static void write(String filename, String[] x) throws IOException {
+    private static void write(String filename, String[] x) throws IOException {
         BufferedWriter outputWriter = null;
         outputWriter = new BufferedWriter(new FileWriter(filename));
         for (int i = 0; i < x.length; i++) {
